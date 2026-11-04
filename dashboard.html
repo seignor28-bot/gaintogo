@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon solde – GainTogo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bande"></div>
+<main class="large">
+  <div class="entete">
+    <h1>GainTogo</h1>
+    <button id="sortir" class="lien" type="button">Se déconnecter</button>
+  </div>
+
+  <div class="carte">
+    <p class="sous" style="margin-bottom:4px">Mon solde</p>
+    <div class="solde"><span id="solde">0</span> <small>FCFA</small></div>
+    <p id="mail" class="sous" style="margin:8px 0 0"></p>
+  </div>
+
+  <div class="carte">
+    <h2>Sondages et tests disponibles</h2>
+    <p class="sous">Terminez un sondage : votre solde augmente automatiquement.</p>
+    <iframe id="cpx" title="Sondages CPX Research"></iframe>
+  </div>
+</main>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const CPX_APP_ID = "35625";
+
+onAuthStateChanged(auth, user => {
+  if (!user) { location.href = "index.html"; return; }
+  document.getElementById("mail").textContent = user.email;
+  document.getElementById("cpx").src =
+    "https://offers.cpx-research.com/index.php?app_id=" + CPX_APP_ID + "&ext_user_id=" + encodeURIComponent(user.uid);
+  onSnapshot(doc(db, "users", user.uid), s => {
+    const v = s.exists() ? (s.data().solde || 0) : 0;
+    document.getElementById("solde").textContent = Number(v).toLocaleString("fr-FR");
+  });
+});
+
+document.getElementById("sortir").onclick = async () => { await
