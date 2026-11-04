@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GainTogo – Gagnez de l’argent avec des tâches simples</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bande"></div>
+<main>
+  <h1>GainTogo</h1>
+  <p class="sous">Répondez à des sondages et testez des applications. Vous êtes payé en FCFA. Aucun dépôt d’argent n’est demandé, jamais.</p>
+
+  <div class="carte">
+    <div class="onglets">
+      <button id="t-connexion" class="actif" type="button">Se connecter</button>
+      <button id="t-inscription" type="button">Créer un compte</button>
+    </div>
+    <label for="email">Adresse e-mail</label>
+    <input id="email" type="email" autocomplete="email" inputmode="email">
+    <label for="mdp">Mot de passe</label>
+    <input id="mdp" type="password" autocomplete="current-password" minlength="6">
+    <button id="envoyer" class="btn" type="button">Se connecter</button>
+    <p id="msg" class="msg" role="status"></p>
+    <button id="oubli" class="lien" type="button">Mot de passe oublié ?</button>
+  </div>
+</main>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+let mode = "connexion";
+const $ = id => document.getElementById(id);
+const msg = (t, err) => { $("msg").textContent = t; $("msg").className = "msg" + (err ? " erreur" : ""); };
+
+function choisir(m){
+  mode = m;
+  $("t-connexion").classList.toggle("actif", m === "connexion");
+  $("t-inscription").classList.toggle("actif", m === "inscription");
+  $("envoyer").textContent = m === "connexion" ?
