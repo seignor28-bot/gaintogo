@@ -2,14 +2,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// À REMPLACER par les valeurs de votre console Firebase (projet gaintogo-1a1bc)
 const firebaseConfig = {
-  apiKey: "COLLEZ_ICI_apiKey",
+  apiKey: "AIzaSyA3XMmNZ9KomS838QXTWnLEwwfJDJqJUwA",
   authDomain: "gaintogo-1a1bc.firebaseapp.com",
   projectId: "gaintogo-1a1bc",
   storageBucket: "gaintogo-1a1bc.firebasestorage.app",
-  messagingSenderId: "COLLEZ_ICI_messagingSenderId",
-  appId: "COLLEZ_ICI_appId"
+  messagingSenderId: "486505663607",
+  appId: "1:486505663607:web:780b0e5001069894b60a72",
+  measurementId: "G-6MQ4EN8ERF"
 };
 
 const app = initializeApp(firebaseConfig);
