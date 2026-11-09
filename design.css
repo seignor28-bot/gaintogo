@@ -1,0 +1,41 @@
+:root{--vert:#0b6b3a;--fonce:#084d29;--jaune:#f2b705;--rouge:#c0392b;--fond:#f2f7f3;--texte:#14221a;--gris:#5b6b61;--ligne:#d6e2d9}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--fond);color:var(--texte);line-height:1.5;min-height:100vh}
+.bande{height:8px;background:linear-gradient(90deg,var(--vert) 0 34%,var(--jaune) 34% 67%,var(--rouge) 67% 100%)}
+.hero{background:linear-gradient(160deg,#0f8a4b,var(--fonce));color:#fff;padding:22px 20px 80px;border-radius:0 0 30px 30px}
+.hero-in{max-width:460px;margin:0 auto}
+.haut{display:flex;justify-content:space-between;align-items:center}
+.marque{font-weight:800;letter-spacing:-.02em;font-size:1.15rem;color:var(--jaune)}
+.hero h1{font-size:2rem;line-height:1.15;margin:12px 0 8px;letter-spacing:-.02em}
+.hero p{margin:0;color:#d9f0e2}
+.hero .lien{color:#fff}
+.etapes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
+.etape{background:rgba(255,255,255,.13);border-radius:12px;padding:10px 6px;text-align:center;font-size:.8rem}
+.etape b{display:block;font-size:1.4rem;color:var(--jaune)}
+main{max-width:460px;margin:-54px auto 0;padding:0 16px 40px;position:relative}
+.large{max-width:760px}
+.carte{background:#fff;border:1px solid var(--ligne);border-radius:16px;padding:20px;margin-top:16px;box-shadow:0 8px 24px rgba(8,77,41,.10)}
+h2{font-size:1.15rem;margin:0 0 8px}
+p{margin:0 0 12px}
+.sous{color:var(--gris)}
+.onglets{display:flex;gap:8px;margin-bottom:14px}
+.onglets button{flex:1;padding:11px;border:1px solid var(--ligne);background:#fff;border-radius:10px;font:inherit;font-weight:600;color:var(--gris)}
+.onglets button.actif{background:var(--vert);border-color:var(--vert);color:#fff}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input{width:100%;padding:13px;border:1px solid var(--ligne);border-radius:10px;font:inherit;background:#fff}
+input:focus,button:focus-visible{outline:3px solid var(--jaune);outline-offset:1px}
+.btn{width:100%;margin-top:18px;padding:14px;border:0;border-radius:12px;background:linear-gradient(135deg,#0f8a4b,var(--vert));color:#fff;font:inherit;font-weight:700;font-size:1.05rem;box-shadow:0 6px 14px rgba(11,107,58,.3)}
+.btn:disabled{opacity:.6}
+.lien{background:none;border:0;color:var(--vert);font:inherit;font-weight:600;text-decoration:underline;padding:0}
+.msg{margin-top:12px;font-weight:600;min-height:1.4em}
+.msg.erreur{color:var(--rouge)}
+.garanties{list-style:none;padding:0;margin:14px 0 0;font-size:.9rem;color:var(--gris)}
+.garanties li::before{content:"✓ ";color:var(--vert);font-weight:800}
+.solde-carte{background:linear-gradient(135deg,#0f8a4b,var(--fonce));color:#fff;border-radius:20px;padding:22px;position:relative;overflow:hidden;box-shadow:0 10px 26px rgba(8,77,41,.3)}
+.solde-carte::after{content:"";position:absolute;right:-34px;top:-34px;width:130px;height:130px;border-radius:50%;background:var(--jaune);opacity:.28}
+.solde-carte .sous{color:#cfeedd;margin:0 0 4px}
+.solde{font-size:3rem;font-weight:800;line-height:1.1}
+.solde small{font-size:1.1rem;font-weight:600;color:#cfeedd}
+.pastille{display:inline-block;background:var(--jaune);color:#3a2c00;font-weight:700;font-size:.78rem;padding:4px 11px;border-radius:99px;margin-top:12px}
+iframe{width:100%;height:640px;border:0;border-radius:12px;background:#fff}
