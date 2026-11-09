@@ -4,22 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mon solde – GainTogo</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="design.css">
 </head>
 <body>
 <div class="bande"></div>
+<header class="hero">
+  <div class="hero-in">
+    <div class="haut">
+      <span class="marque">GainTogo</span>
+      <button id="sortir" class="lien" type="button">Se déconnecter</button>
+    </div>
+    <h1>Bonjour 👋</h1>
+    <p id="mail"></p>
+  </div>
+</header>
 <main class="large">
-  <div class="entete">
-    <h1>GainTogo</h1>
-    <button id="sortir" class="lien" type="button">Se déconnecter</button>
-  </div>
-  <div class="carte">
-    <p class="sous" style="margin-bottom:4px">Mon solde</p>
+  <div class="solde-carte">
+    <p class="sous">Mon solde</p>
     <div class="solde"><span id="solde">0</span> <small>FCFA</small></div>
-    <p id="mail" class="sous" style="margin:8px 0 0"></p>
+    <span class="pastille">Mis à jour automatiquement</span>
   </div>
   <div class="carte">
-    <h2>Sondages et tests disponibles</h2>
+    <h2>Sondages disponibles</h2>
     <p class="sous">Terminez un sondage : votre solde augmente automatiquement.</p>
     <iframe id="cpx" title="Sondages CPX Research"></iframe>
   </div>
