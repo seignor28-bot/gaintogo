@@ -18,4 +18,4 @@ onAuthStateChanged(auth, user => {
 document.getElementById("sortir").onclick = async () => {
   await signOut(auth);
   location.href = "index.html";
-};
+};import "./retrait.js";
