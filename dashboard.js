@@ -17,6 +17,16 @@ function laDate(v) {
   } catch (e) { return null; }
 }
 
+function libelle(s) {
+  const t = String(s || "").toLowerCase();
+  if (t === "1" || t === "gain" || t === "credit") return "Gain sondage";
+  if (t === "retrait_reserve") return "Retrait demandé";
+  if (t === "retrait_rembourse") return "Retrait remboursé";
+  if (t === "retrait_paye") return "Retrait payé";
+  if (t.indexOf("annul") !== -1) return "Gain annulé";
+  return s ? String(s) : "Transaction";
+}
+
 function ligne(id, apres) {
   let el = document.getElementById(id);
   if (!el) {
@@ -70,8 +80,9 @@ onAuthStateChanged(auth, user => {
       liste.forEach(t => {
         const d = laDate(t.date);
         const m = Number(t.montant || 0);
-        const annule = String(t.statut || "").toLowerCase().indexOf("annul") !== -1;
-        if (d && d >= debut && m > 0 && !annule) jour += m;
+        const st = String(t.statut || "").toLowerCase();
+        const gain = st === "1" || st === "gain" || st === "credit";
+        if (d && d >= debut && m > 0 && gain) jour += m;
       });
 
       const payes = document.getElementById("payes");
@@ -91,12 +102,14 @@ onAuthStateChanged(auth, user => {
       }
       liste.slice(0, 10).forEach(t => {
         const d = laDate(t.date);
+        const m = Number(t.montant || 0);
         const l = document.createElement("div");
         l.style.cssText = "display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #eee";
         const g = document.createElement("span");
-        g.textContent = (d ? d.toLocaleDateString("fr-FR") : "") + (t.statut ? " · " + t.statut : "");
+        g.textContent = (d ? d.toLocaleDateString("fr-FR") + " · " : "") + libelle(t.statut);
         const r = document.createElement("span");
-        r.textContent = fcfa(t.montant);
+        r.textContent = m === 0 ? "—" : (m > 0 ? "+" : "") + fcfa(m);
+        r.style.color = m < 0 ? "#c0392b" : (m > 0 ? "#1e8449" : "#666");
         l.appendChild(g);
         l.appendChild(r);
         h.appendChild(l);
