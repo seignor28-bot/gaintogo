@@ -81,7 +81,7 @@ onAuthStateChanged(auth, user => {
         const d = laDate(t.date);
         const m = Number(t.montant || 0);
         const st = String(t.statut || "").toLowerCase();
-        const gain = st === "1" || st === "gain" || st === "credit";
+        const gain = st === "1" || st === "gain" || st === "credit". || st === "bonus" ;
         if (d && d >= debut && m > 0 && gain) jour += m;
       });
 
