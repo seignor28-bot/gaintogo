@@ -1,6 +1,7 @@
 import "./profil.js";
 import "./pwa.js";
 import "./bonus.js";
+import "./notif.js";
 import { auth } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
