@@ -22,7 +22,7 @@ function libelle(s) {
   if (t === "1" || t === "gain" || t === "credit") return "Gain sondage";
   if (t === "retrait_reserve") return "Retrait demandé";
   if (t === "retrait_rembourse") return "Retrait remboursé";
-  if (t === "retrait_paye") return "Retrait payé" if (t === "bonus") return "Bonus quotidien"; ;
+  if (t === "retrait_paye") return "Retrait payé" if (t === "bonus") return "Bonus quotidien"; 
   if (t.indexOf("annul") !== -1) return "Gain annulé";
   return s ? String(s) : "Transaction";
 }
@@ -81,7 +81,7 @@ onAuthStateChanged(auth, user => {
         const d = laDate(t.date);
         const m = Number(t.montant || 0);
         const st = String(t.statut || "").toLowerCase();
-        const gain = st === "1" || st === "gain" || st === "credit". || st === "bonus" ;
+        const gain = st === "1" || st === "gain" || st === "credit".|| st === "bonus" ;
         if (d && d >= debut && m > 0 && gain) jour += m;
       });
 
