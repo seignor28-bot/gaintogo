@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GainTogo - Administration</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; background: #f1f5f2; color: #222; }
+  header { background: #166534; color: #fff; padding: 16px; }
+  main { padding: 12px; max-width: 600px; margin: auto; }
+  .carte { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  .stat { display: flex; justify-content: space-between; margin: 6px 0; font-size: 15px; }
+  .ligne { border-top: 1px solid #e5e7eb; padding: 10px 0; font-size: 14px; }
+  .att { color: #b45309; font-weight: bold; }
+  .paye { color: #166534; font-weight: bold; }
+  .refuse { color: #b91c1c; font-weight: bold; }
+  button { width: 100%; padding: 12px; font-size: 15px; border: 0; border-radius: 8px; background: #16a34a; color: #fff; }
+  a { color: #166534; }
+</style>
+</head>
+<body>
+<header><strong>GainTogo — Administration</strong></header>
+<main>
+  <div class="carte" id="stats">Chargement...</div>
+  <div class="carte"><h3 style="margin-top:0">Retraits</h3><div id="liste"></div></div>
+  <button id="actualiser">Actualiser</button>
+  <p id="msg"></p>
+</main>
+
+<script type="module">
+import { auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const SERVEUR = "https://script.google.com/macros/s/AKfycbytYRN-NW3dUoSeIk5aXf3UvsQ1tqbRkQU9IBwJWYtkWOpgWkCd9U_D5CWyyTx1L7jADA/exec";
+
+const stats = document.getElementById("stats");
+const liste = document.getElementById("liste");
+const msg = document.getElementById("msg");
+let utilisateur = null;
+
+function ligneStat(label, valeur) {
+  const d = document.createElement("div");
+  d.className = "stat";
+  const a = document.createElement("span");
+  a.textContent = label;
+  const b = document.createElement("strong");
+  b.textContent = valeur;
+  d.appendChild(a);
+  d.appendChild(b);
+  return d;
+}
+
+function texte(parent, contenu, style) {
+  const p = document.createElement("div");
+  p.textContent = contenu;
+  if (style) p.className = style;
+  parent.appendChild(p);
+}
+
+async function charger() {
+  if (!utilisateur) return;
+  msg.textContent = "Chargement...";
+  try {
+    const idToken = await utilisateur.getIdToken();
+    const r = await fetch(SERVEUR, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "admin", idToken: idToken })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      msg.textContent = d.message || "Erreur";
+      stats.textContent = "";
+      return;
+    }
+    msg.textContent = "";
+
+    const retraits = (d.retraits || []).slice().sort(function (a, b) {
+      return String(b.date).localeCompare(String(a.date));
+    });
+    const nbAttente = retraits.filter(function (x) { return x.statut === "en_attente"; }).length;
+
+    stats.textContent = "";
+    stats.appendChild(ligneStat("Membres", String(d.nbMembres)));
+    stats.appendChild(ligneStat("Total des soldes", Number(d.totalSoldes).toLocaleString("fr-FR") + " FCFA"));
+    stats.appendChild(ligneStat("Retraits à payer", String(nbAttente)));
+
+    liste.textContent = "";
+    if (retraits.length === 0) {
+      liste.textContent = "Aucun retrait pour le moment.";
+      return;
+    }
+    retraits.forEach(function (x) {
+      const bloc = document.createElement("div");
+      bloc.className = "ligne";
+      texte(bloc, Number(x.montant).toLocaleString("fr-FR") + " FCFA · " + x.operateur + " · " + x.telephone);
+      texte(bloc, x.email);
+      let dateTxt = x.date;
+      const t = new Date(x.date);
+      if (!isNaN(t.getTime())) dateTxt = t.toLocaleString("fr-FR");
+      texte(bloc, dateTxt);
+      let etiquette = x.statut;
+      let classe = "";
+      if (x.statut === "en_attente") { etiquette = "À PAYER"; classe = "att"; }
+      else if (x.statut === "paye") { etiquette = "Payé"; classe = "paye"; }
+      else if (x.statut === "refuse") { etiquette = "Refusé"; classe = "refuse"; }
+      texte(bloc, etiquette, classe);
+      liste.appendChild(bloc);
+    });
+  } catch (e) {
+    msg.textContent = "Erreur de connexion, réessaie.";
+  }
+}
+
+onAuthStateChanged(auth, function (user) {
+  if (!user) {
+    stats.textContent = "";
+    msg.innerHTML = 'Connecte-toi d\'abord sur le <a href="./dashboard.html">site</a> avec ton compte administrateur.';
+    return;
+  }
+  utilisateur = user;
+  charger();
+});
+
+document.getElementById("actualiser").onclick = charger;
+</script>
+</body>
+</html>
