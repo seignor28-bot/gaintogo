@@ -1,8 +1,9 @@
 import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let mode = "connexion";
+let enCours = false;
 const $ = id => document.getElementById(id);
 const msg = (t, err) => { $("msg").textContent = t; $("msg").className = "msg" + (err ? " erreur" : ""); };
 
@@ -25,33 +26,44 @@ const erreurs = {
   "auth/invalid-credential": "E-mail ou mot de passe incorrect.",
   "auth/user-not-found": "Aucun compte avec cette adresse.",
   "auth/wrong-password": "Mot de passe incorrect.",
-  "auth/too-many-requests": "Trop d’essais. Réessayez dans quelques minutes.",
+  "auth/too-many-requests": "Trop d'essais. Réessayez dans quelques minutes.",
   "auth/network-request-failed": "Pas de connexion internet.",
-  "auth/unauthorized-domain": "Ce site n’est pas encore autorisé dans Firebase (domaines autorisés)."
+  "auth/unauthorized-domain": "Ce site n'est pas encore autorisé dans Firebase (domaines autorisés)."
 };
+
+async function creerFiche(user, email) {
+  const ref = doc(db, "users", user.uid);
+  const existe = await getDoc(ref);
+  if (!existe.exists()) {
+    await setDoc(ref, { email: email, solde: 0, createdAt: serverTimestamp() });
+  }
+}
 
 $("envoyer").onclick = async () => {
   const email = $("email").value.trim(), mdp = $("mdp").value;
   $("envoyer").disabled = true; msg("Un instant…");
+  enCours = true;
   try {
+    let c;
     if (mode === "inscription") {
-      const c = await createUserWithEmailAndPassword(auth, email, mdp);
-      await setDoc(doc(db, "users", c.user.uid), { email, solde: 0, createdAt: serverTimestamp() });
+      c = await createUserWithEmailAndPassword(auth, email, mdp);
     } else {
-      await signInWithEmailAndPassword(auth, email, mdp);
+      c = await signInWithEmailAndPassword(auth, email, mdp);
     }
+    await creerFiche(c.user, email);
     location.href = "dashboard.html";
   } catch (e) {
-    msg(erreurs[e.code] || "Erreur : " + e.code, true);
+    enCours = false;
+    msg(erreurs[e.code] || "Erreur : " + (e.code || e.message), true);
     $("envoyer").disabled = false;
   }
 };
 
 $("oubli").onclick = async () => {
   const email = $("email").value.trim();
-  if (!email) return msg("Entrez d’abord votre e-mail ci-dessus.", true);
+  if (!email) return msg("Entrez d'abord votre e-mail ci-dessus.", true);
   try { await sendPasswordResetEmail(auth, email); msg("E-mail de réinitialisation envoyé."); }
   catch (e) { msg(erreurs[e.code] || "Erreur : " + e.code, true); }
 };
 
-onAuthStateChanged(auth, u => { if (u) location.href = "dashboard.html"; });
+onAuthStateChanged(auth, u => { if (u && !enCours) location.href = "dashboard.html"; });
