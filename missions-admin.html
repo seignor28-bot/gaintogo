@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GainTogo - Missions</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; background: #f1f5f2; color: #222; }
+  header { background: #166534; color: #fff; padding: 16px; }
+  main { padding: 12px; max-width: 600px; margin: auto; }
+  .carte { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  label { display: block; font-weight: bold; margin: 12px 0 4px; }
+  select, input { width: 100%; padding: 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+  button { width: 100%; padding: 12px; font-size: 15px; border: 0; border-radius: 8px; background: #16a34a; color: #fff; margin-top: 14px; }
+  .ok { color: #166534; font-weight: bold; }
+  .erreur { color: #b91c1c; font-weight: bold; }
+  a { color: #166534; }
+</style>
+</head>
+<body>
+<header><strong>GainTogo – Créditer une mission</strong></header>
+<main>
+  <div class="carte">
+    <label for="membre">Membre</label>
+    <select id="membre"></select>
+    <label for="mission">Nom de la mission (lettres, chiffres, tiret)</label>
+    <input id="mission" type="text" maxlength="40" placeholder="ex : photos-lome-01">
+    <label for="montant">Montant (FCFA, 1 à 5000)</label>
+    <input id="montant" type="number" inputmode="numeric" min="1" max="5000">
+    <button id="crediter" type="button">Créditer</button>
+    <p id="msg"></p>
+  </div>
+  <p><a href="./admin.html">Retour à l’administration</a></p>
+</main>
+
+<script type="module">
+import { auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const SERVEUR = "https://script.google.com/macros/s/AKfycbytYRN-NW3dUoSeIk5aXf3UvsQ1tqbRkQU9IBwJWYtkWOpgWkCd9U_D5CWyyTx1L7jADA/exec";
+
+const selectMembre = document.getElementById("membre");
+const champMission = document.getElementById("mission");
+const champMontant = document.getElementById("montant");
+const msg = document.getElementById("msg");
+let utilisateur = null;
+
+function afficher(texte, erreur) {
+  msg.textContent = texte;
+  msg.className = erreur ? "erreur" : "ok";
+}
+
+async function appeler(donnees) {
+  const idToken = await utilisateur.getIdToken();
+  donnees.idToken = idToken;
+  const r = await fetch(SERVEUR, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(donnees)
+  });
+  return r.json();
+}
+
+async function chargerMembres() {
+  afficher("Chargement…", false);
+  try {
+    const d = await appeler({ action: "membres" });
+    if (!d.ok) { afficher(d.message || "Erreur", true); return; }
+    selectMembre.textContent = "";
+    d.membres.forEach(function (m) {
+      const o = document.createElement("option");
+      o.value = m.uid;
+      o.textContent = m.email || m.uid;
+      selectMembre.appendChild(o);
+    });
+    afficher("", false);
+  } catch (e) {
+    afficher("Erreur de connexion, réessaie.", true);
+  }
+}
+
+document.getElementById("crediter").onclick = async function () {
+  const uid = selectMembre.value;
+  const mission = champMission.value.trim();
+  const montant = Number(champMontant.value);
+  if (!uid || !mission || !montant) { afficher("Remplis les trois cases.", true); return; }
+  if (!confirm("Créditer " + montant + " FCFA à " + selectMembre.options[selectMembre.selectedIndex].textContent + " ?")) return;
+  afficher("Un instant…", false);
+  try {
+    const d = await appeler({ action: "mission", uid: uid, mission: mission, montant: montant });
+    afficher(d.message || (d.ok ? "OK" : "Erreur"), !d.ok);
+  } catch (e) {
+    afficher("Erreur de connexion, réessaie.", true);
+  }
+};
+
+onAuthStateChanged(auth, function (user) {
+  if (!user) { afficher("Connecte-toi d’abord sur le site avec ton compte administrateur.", true); return; }
+  utilisateur = user;
+  chargerMembres();
+});
+</script>
+</body>
+</html>
