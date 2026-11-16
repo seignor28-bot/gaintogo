@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test membres</title>
+</head>
+<body style="font-family:Arial;padding:12px">
+<h3>Test serveur</h3>
+<pre id="res" style="white-space:pre-wrap;word-break:break-all">Chargement…</pre>
+<script type="module">
+import { auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const SERVEUR = "https://script.google.com/macros/s/AKfycbytYRN-NW3dUoSeIk5aXf3UvsQ1tqbRkQU9IBwJWYtkWOpgWkCd9U_D5CWyyTx1L7jADA/exec";
+const res = document.getElementById("res");
+
+onAuthStateChanged(auth, async function (user) {
+  if (!user) { res.textContent = "Pas connecté sur ce site."; return; }
+  try {
+    const idToken = await user.getIdToken();
+    const r = await fetch(SERVEUR, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "membres", idToken: idToken })
+    });
+    const t = await r.text();
+    res.textContent = "Code " + r.status + "\n\n" + t.slice(0, 600);
+  } catch (e) {
+    res.textContent = "Erreur réseau : " + e.message;
+  }
+});
+</script>
+</body>
+</html>
