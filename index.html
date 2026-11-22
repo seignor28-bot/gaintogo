@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GainTogo – Gagnez de l’argent avec des sondages</title>
+<title>GainTogo – Missions rémunérées au Togo</title>
 <link rel="stylesheet" href="design.css">
 </head>
 <body>
 <div class="bande"></div>
-<header class="hero">
-  <div class="hero-in">
-    <div class="haut"><span class="marque">GainTogo</span></div>
-    <h1>Gagnez de l’argent avec des sondages</h1>
-    <p>Donnez votre avis, soyez payé en FCFA. Gratuit, sans dépôt d’argent.</p>
-    <div class="etapes">
-      <div class="etape"><b>1</b>Créez votre compte</div>
-      <div class="etape"><b>2</b>Répondez aux sondages</div>
-      <div class="etape"><b>3</b>Cumulez vos gains</div>
+<header class="g-ban">
+  <img src="images/banniere.webp" alt="Jeunes Togolais regardant leurs smartphones" width="756" height="434">
+  <div class="g-ban-txt">
+    <span class="marque">GainTogo</span>
+    <h1>Des missions rémunérées au Togo</h1>
+    <p>Membres, entreprises et ambassadeurs : ensemble, plus loin.</p>
+    <div class="g-btns">
+      <a class="g-b g-b1" href="#connexion">Se connecter</a>
+      <a class="g-b g-b2" href="missions.html">Voir les missions</a>
     </div>
   </div>
 </header>
-<main>
-  <div class="carte">
+<main class="g-main">
+  <div class="carte" id="connexion">
     <div class="onglets">
       <button id="t-connexion" class="actif" type="button">Se connecter</button>
       <button id="t-inscription" type="button">Créer un compte</button>
@@ -36,9 +36,39 @@
     <ul class="garanties">
       <li>Inscription 100 % gratuite</li>
       <li>Aucun dépôt d’argent demandé, jamais</li>
-      <li>Sondages proposés par CPX Research</li>
+      <li>Missions payées par des entreprises</li>
     </ul>
   </div>
+
+  <section class="carte g-pil">
+    <img src="images/members.webp" alt="Un membre photographiant une boutique" width="756" height="434" loading="lazy">
+    <div>
+      <span class="g-tag">GAIN MEMBERS</span>
+      <h2>Faites des missions près de chez vous</h2>
+      <p>Photos de points de vente, vérifications d’adresses, enquêtes courtes : réalisez de petites missions et soyez payé après validation.</p>
+      <a class="g-b g-b3" href="missions.html">Voir les missions</a>
+    </div>
+  </section>
+
+  <section class="carte g-pil">
+    <img src="images/business.webp" alt="Vérification de produits en boutique" width="756" height="434" loading="lazy">
+    <div>
+      <span class="g-tag">GAIN BUSINESS</span>
+      <h2>Entreprises partenaires</h2>
+      <p>Confiez vos missions de terrain à notre réseau : photos, relevés de prix, vérifications, avec preuves à l’appui.</p>
+      <a class="g-b g-b3" href="https://wa.me/22890426482?text=GainTogo%20-%20Bonjour%2C%20je%20repr%C3%A9sente%20une%20entreprise%20et%20je%20veux%20en%20savoir%20plus.">Nous contacter sur WhatsApp</a>
+    </div>
+  </section>
+
+  <section class="carte g-pil">
+    <img src="images/ambassadors.webp" alt="Une équipe GainTogo au travail" width="756" height="434" loading="lazy">
+    <div>
+      <span class="g-tag">GAIN AMBASSADORS</span>
+      <h2>Représentez GainTogo</h2>
+      <p>Rejoignez notre réseau de représentation dans votre quartier ou votre ville et aidez à faire connaître GainTogo.</p>
+      <a class="g-b g-b3" href="https://wa.me/22890426482?text=GainTogo%20-%20Bonjour%2C%20je%20veux%20devenir%20ambassadeur.">Devenir ambassadeur</a>
+    </div>
+  </section>
 </main>
 <script type="module" src="app.js"></script>
 </body>
