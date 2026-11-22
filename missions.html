@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GainTogo - Missions</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; background: #f1f5f2; color: #222; }
+  header { background: #166534; color: #fff; padding: 16px; }
+  main { padding: 12px; max-width: 600px; margin: auto; }
+  .carte { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  h2 { margin: 0 0 8px; font-size: 18px; }
+  h3 { margin: 0 0 6px; font-size: 16px; }
+  p { margin: 6px 0; font-size: 15px; line-height: 1.4; }
+  ul { margin: 6px 0; padding-left: 20px; font-size: 15px; line-height: 1.5; }
+  .prix { color: #166534; font-weight: bold; }
+  .etat { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: bold; }
+  .ouverte { background: #dcfce7; color: #166534; }
+  .complete { background: #e5e7eb; color: #555; }
+  .btn { display: block; text-align: center; padding: 12px; margin-top: 10px; font-size: 16px; border-radius: 8px; background: #16a34a; color: #fff; text-decoration: none; }
+  a { color: #166534; }
+</style>
+</head>
+<body>
+<header><strong>GainTogo — Missions</strong></header>
+<main>
+  <div class="carte">
+    <h2>Comment ça marche</h2>
+    <ul>
+      <li>Choisis une mission ouverte ci-dessous.</li>
+      <li>Fais-la sur le terrain et envoie les preuves demandées (photos, lieu, heure).</li>
+      <li>Après vérification, ton gain est ajouté à ton solde.</li>
+      <li>Tu retires ton solde par Flooz ou Mixx by Yas, à partir de 1 000 FCFA, une fois par semaine.</li>
+    </ul>
+    <p>Les gains dépendent uniquement des missions réellement faites et validées. Aucun gain n'est garanti.</p>
+  </div>
+
+  <div id="liste"></div>
+
+  <div class="carte">
+    <h2>Avant de commencer</h2>
+    <ul>
+      <li>Ton compte doit être créé et ton e-mail vérifié.</li>
+      <li>Ne partage jamais ton mot de passe.</li>
+      <li>GainTogo ne te demande jamais d'argent.</li>
+    </ul>
+    <a class="btn" href="./dashboard.html">Retour à mon solde</a>
+  </div>
+</main>
+
+<script>
+// Pour modifier la page : changer cette liste, puis enregistrer le fichier sur GitHub.
+// etat : "ouverte" ou "complete"
+const MISSIONS = [
+  {
+    titre: "Exemple : photographier une devanture",
+    description: "Photographier la devanture d'un commerce indiqué, avec le nom visible et la rue.",
+    paiement: 500,
+    etat: "ouverte"
+  }
+];
+
+// Numéro WhatsApp de GainTogo, au format international sans le +, par exemple 22890000000.
+// Laisse vide pour cacher le bouton.
+const WHATSAPP = "";
+
+const liste = document.getElementById("liste");
+
+function ajouter(parent, balise, texte, classe) {
+  const el = document.createElement(balise);
+  el.textContent = texte;
+  if (classe) el.className = classe;
+  parent.appendChild(el);
+  return el;
+}
+
+if (MISSIONS.length === 0) {
+  const c = document.createElement("div");
+  c.className = "carte";
+  ajouter(c, "p", "Aucune mission ouverte pour le moment. Reviens bientôt.");
+  liste.appendChild(c);
+}
+
+MISSIONS.forEach(function (m) {
+  const c = document.createElement("div");
+  c.className = "carte";
+  ajouter(c, "h3", m.titre);
+  ajouter(c, "p", m.description);
+  const p = ajouter(c, "p", "");
+  ajouter(p, "span", Number(m.paiement).toLocaleString("fr-FR") + " FCFA", "prix");
+  p.appendChild(document.createTextNode(" "));
+  ajouter(p, "span", m.etat === "ouverte" ? "Ouverte" : "Complète", "etat " + (m.etat === "ouverte" ? "ouverte" : "complete"));
+
+  if (m.etat === "ouverte" && WHATSAPP) {
+    const a = document.createElement("a");
+    a.className = "btn";
+    a.textContent = "Je veux faire cette mission";
+    a.href = "https://wa.me/" + WHATSAPP + "?text=" +
+      encodeURIComponent("Bonjour, je veux faire la mission : " + m.titre);
+    c.appendChild(a);
+  }
+  liste.appendChild(c);
+});
+</script>
+</body>
+</html>
