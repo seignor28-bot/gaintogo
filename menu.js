@@ -24,7 +24,8 @@ if (!document.getElementById("menu-bas")) {
       const c = document.getElementById("carte-retrait");
       if (c) c.scrollIntoView({ behavior: "smooth", block: "center" });
     }],
-    ["🧾", "Historique", function () { aller("Historique"); }]
+    ["🧾", "Historique", function () { aller("Historique"); }],
+      ["📋", "Missions", function () { window.location.href = "missions.html"; }]
   ];
 
   const nav = document.createElement("nav");
