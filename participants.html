@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GainTogo - Participants</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; background: #f1f5f2; color: #222; }
+  header { background: #166534; color: #fff; padding: 16px; }
+  main { padding: 12px; max-width: 600px; margin: auto; }
+  .carte { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  label { display: block; margin: 12px 0 4px; font-size: 14px; font-weight: bold; }
+  select, input { width: 100%; box-sizing: border-box; padding: 12px; font-size: 16px; border: 1px solid #cbd5d0; border-radius: 8px; background: #fff; }
+  button { width: 100%; margin-top: 16px; padding: 12px; font-size: 16px; border: 0; border-radius: 8px; background: #16a34a; color: #fff; }
+  button:disabled { opacity: .6; }
+  a { color: #166534; }
+  #msg { font-size: 15px; }
+  .aide { font-size: 13px; color: #555; margin: 4px 0 0; }
+</style>
+</head>
+<body>
+<header><strong>GainTogo — Participants</strong></header>
+<main>
+  <div class="carte">
+    <label for="membre">Membre retenu</label>
+    <select id="membre"></select>
+
+    <label for="mission">Code de la mission (lettres, chiffres, - ou _)</label>
+    <input id="mission" type="text" placeholder="ex : chantiers-001">
+    <p class="aide">Utilise le même code que sur la page de crédit, pour retrouver facilement la mission.</p>
+
+    <button id="envoyer">Sélectionner ce membre</button>
+    <p id="msg"></p>
+  </div>
+  <p><a href="./credit.html">Aller à la page de crédit</a></p>
+  <p><a href="./admin.html">← Retour à l'administration</a></p>
+</main>
+
+<script type="module">
+import { auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const SERVEUR = "https://script.google.com/macros/s/AKfycbytYRN-NW3dUoSeIk5aXf3UvsQ1tqbRkQU9IBwJWYtkWOpgWkCd9U_D5CWyyTx1L7jADA/exec";
+
+const selecteur = document.getElementById("membre");
+const msg = document.getElementById("msg");
+const bouton = document.getElementById("envoyer");
+let utilisateur = null;
+
+async function appeler(corps) {
+  corps.idToken = await utilisateur.getIdToken();
+  const r = await fetch(SERVEUR, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(corps)
+  });
+  return r.json();
+}
+
+async function chargerMembres() {
+  msg.textContent = "Chargement des membres...";
+  try {
+    const d = await appeler({ action: "membres" });
+    if (!d.ok) {
+      msg.textContent = d.message || "Erreur";
+      return;
+    }
+    selecteur.textContent = "";
+    (d.membres || []).forEach(function (m) {
+      const o = document.createElement("option");
+      o.value = m.uid;
+      o.textContent = (m.email || "(sans e-mail)") + " · " + String(m.uid).slice(0, 6);
+      selecteur.appendChild(o);
+    });
+    msg.textContent = (d.membres && d.membres.length) ? "" : "Aucun membre trouvé.";
+  } catch (e) {
+    msg.textContent = "Erreur de connexion, réessaie.";
+  }
+}
+
+bouton.onclick = async function () {
+  const uid = selecteur.value;
+  const mission = document.getElementById("mission").value.trim();
+
+  if (!uid) { msg.textContent = "Choisis un membre."; return; }
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(mission)) {
+    msg.textContent = "Code de mission invalide : lettres, chiffres, - ou _ seulement.";
+    return;
+  }
+
+  const nom = selecteur.options[selecteur.selectedIndex].textContent;
+  if (!confirm("Sélectionner " + nom + " pour la mission " + mission + " ?")) return;
+
+  bouton.disabled = true;
+  msg.textContent = "Envoi...";
+  try {
+    const d = await appeler({ action: "participant", uid: uid, mission: mission });
+    msg.textContent = d.message || (d.ok ? "OK" : "Erreur");
+  } catch (e) {
+    msg.textContent = "Erreur de connexion, réessaie.";
+  }
+  bouton.disabled = false;
+};
+
+onAuthStateChanged(auth, function (user) {
+  if (!user) {
+    msg.innerHTML = 'Connecte-toi d\'abord sur le <a href="./dashboard.html">site</a> avec ton compte administrateur.';
+    return;
+  }
+  utilisateur = user;
+  chargerMembres();
+});
+</script>
+</body>
+</html>
