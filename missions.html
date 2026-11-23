@@ -14,9 +14,13 @@
   p { margin: 6px 0; font-size: 15px; line-height: 1.4; }
   ul { margin: 6px 0; padding-left: 20px; font-size: 15px; line-height: 1.5; }
   .prix { color: #166534; font-weight: bold; }
-  .etat { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: bold; }
-  .ouverte { background: #dcfce7; color: #166534; }
-  .complete { background: #e5e7eb; color: #555; }
+  .cat { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: bold; margin-bottom: 6px; }
+  .terrain { background: #dcfce7; color: #166534; }
+  .commerciale { background: #fef3c7; color: #92400e; }
+  .info { font-size: 14px; color: #444; margin: 4px 0; }
+  .filtres { display: flex; gap: 8px; margin-bottom: 12px; }
+  .filtre { flex: 1; padding: 10px 4px; font-size: 14px; border: 1px solid #16a34a; border-radius: 8px; background: #fff; color: #166534; font-weight: bold; }
+  .filtre.actif { background: #16a34a; color: #fff; }
   .btn { display: block; text-align: center; padding: 12px; margin-top: 10px; font-size: 16px; border-radius: 8px; background: #16a34a; color: #fff; text-decoration: none; }
   a { color: #166534; }
 </style>
@@ -35,6 +39,12 @@
     <p>Les gains dépendent uniquement des missions réellement faites et validées. Aucun gain n'est garanti.</p>
   </div>
 
+  <div class="filtres">
+    <button class="filtre actif" data-f="toutes">Toutes</button>
+    <button class="filtre" data-f="terrain">Terrain</button>
+    <button class="filtre" data-f="commerciale">Commerciales</button>
+  </div>
+
   <div id="liste"></div>
 
   <div class="carte">
@@ -50,21 +60,27 @@
 
 <script>
 // Pour modifier la page : changer cette liste, puis enregistrer le fichier sur GitHub.
-// etat : "ouverte" ou "complete"
+// categorie : "terrain" ou "commerciale"
+// etat : "ouverte" (affichée) ou "complete" (cachée)
 const MISSIONS = [
   {
-        titre: "Photographier des chantiers",
-        description: "Photographier un chantier : vue d'ensemble, engins présents et nom de la rue, avec la date visible.",
+    categorie: "terrain",
+    titre: "Photographier des chantiers",
+    description: "Photographier un chantier : vue d'ensemble, engins présents et nom de la rue, avec la date visible.",
+    localisation: "Lomé",
+    delai: "3 jours",
     paiement: 500,
     etat: "ouverte"
   }
 ];
 
-// Numéro WhatsApp de GainTogo, au format international sans le +, par exemple 22890000000.
+// Numéro WhatsApp de GainTogo, au format international sans le +.
 // Laisse vide pour cacher le bouton.
 const WHATSAPP = "22890426482";
 
+const NOMS = { terrain: "Mission terrain", commerciale: "Mission commerciale" };
 const liste = document.getElementById("liste");
+let filtre = "toutes";
 
 function ajouter(parent, balise, texte, classe) {
   const el = document.createElement(balise);
@@ -74,33 +90,53 @@ function ajouter(parent, balise, texte, classe) {
   return el;
 }
 
-if (MISSIONS.length === 0) {
-  const c = document.createElement("div");
-  c.className = "carte";
-  ajouter(c, "p", "Aucune mission ouverte pour le moment. Reviens bientôt.");
-  liste.appendChild(c);
+function afficher() {
+  liste.innerHTML = "";
+  const visibles = MISSIONS.filter(function (m) {
+    return m.etat === "ouverte" && (filtre === "toutes" || m.categorie === filtre);
+  });
+
+  if (visibles.length === 0) {
+    const c = document.createElement("div");
+    c.className = "carte";
+    ajouter(c, "p", "Aucune mission ouverte pour le moment dans cette catégorie. Reviens bientôt.");
+    liste.appendChild(c);
+    return;
+  }
+
+  visibles.forEach(function (m) {
+    const c = document.createElement("div");
+    c.className = "carte";
+    ajouter(c, "span", NOMS[m.categorie] || "Mission", "cat " + (m.categorie === "commerciale" ? "commerciale" : "terrain"));
+    ajouter(c, "h3", m.titre);
+    ajouter(c, "p", m.description);
+    if (m.localisation) ajouter(c, "p", "Lieu : " + m.localisation, "info");
+    if (m.delai) ajouter(c, "p", "Délai : " + m.delai, "info");
+    const p = ajouter(c, "p", "Rémunération par membre : ", "info");
+    ajouter(p, "span", Number(m.paiement).toLocaleString("fr-FR") + " FCFA", "prix");
+
+    if (WHATSAPP) {
+      const a = document.createElement("a");
+      a.className = "btn";
+      a.textContent = "Je veux faire cette mission";
+      a.href = "https://wa.me/" + WHATSAPP + "?text=" +
+        encodeURIComponent("GainTogo - Bonjour, je veux faire la mission : " + m.titre);
+      c.appendChild(a);
+    }
+    liste.appendChild(c);
+  });
 }
 
-MISSIONS.forEach(function (m) {
-  const c = document.createElement("div");
-  c.className = "carte";
-  ajouter(c, "h3", m.titre);
-  ajouter(c, "p", m.description);
-  const p = ajouter(c, "p", "");
-  ajouter(p, "span", Number(m.paiement).toLocaleString("fr-FR") + " FCFA", "prix");
-  p.appendChild(document.createTextNode(" "));
-  ajouter(p, "span", m.etat === "ouverte" ? "Ouverte" : "Complète", "etat " + (m.etat === "ouverte" ? "ouverte" : "complete"));
-
-  if (m.etat === "ouverte" && WHATSAPP) {
-    const a = document.createElement("a");
-    a.className = "btn";
-    a.textContent = "Je veux faire cette mission";
-    a.href = "https://wa.me/" + WHATSAPP + "?text=" +
-      encodeURIComponent("GainTogo - Bonjour, je veux faire la mission : " + m.titre);
-    c.appendChild(a);
-  }
-  liste.appendChild(c);
+document.querySelectorAll(".filtre").forEach(function (b) {
+  b.onclick = function () {
+    filtre = b.getAttribute("data-f");
+    document.querySelectorAll(".filtre").forEach(function (x) { x.classList.remove("actif"); });
+    b.classList.add("actif");
+    afficher();
+  };
 });
+
+afficher();
 </script>
 </body>
 </html>
